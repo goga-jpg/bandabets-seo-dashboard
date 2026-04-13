@@ -7,18 +7,14 @@ import KPICard from '../common/KPICard'
 import SectionHeader from '../common/SectionHeader'
 import { gscSummary, gscDailyData } from '../../data/gscData'
 import { ga4Summary, ga4DailyData, ga4Channels } from '../../data/ga4Data'
+import {
+  countryGSCData, countryGA4Data,
+  countrySummaryGSC, countrySummaryGA4,
+} from '../../data/countryData'
+import { useFilters, sliceByDays } from '../../context/FilterContext'
 
 const ACCENT = '#fa9602'
 const BLUE = '#3b82f6'
-const GREEN = '#10b981'
-const PURPLE = '#8b5cf6'
-
-// Merge GSC + GA4 for combined trend
-const combinedTrend = gscDailyData.map((g, i) => ({
-  date: g.date,
-  clicks: g.clicks,
-  sessions: ga4DailyData[i]?.sessions ?? 0,
-}))
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: {name: string; value: number; color: string}[]; label?: string }) => {
   if (!active || !payload?.length) return null
@@ -37,9 +33,25 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
 }
 
 export default function OverviewDashboard() {
+  const { country, dateRange } = useFilters()
+  const isFiltered = country !== 'All'
+  const countryKey = country as keyof typeof countryGSCData
+
+  const gsc  = isFiltered ? countrySummaryGSC[countryKey] : gscSummary
+  const ga4  = isFiltered ? countrySummaryGA4[countryKey] : ga4Summary
+
+  const gscDaily = sliceByDays(isFiltered ? countryGSCData[countryKey] : gscDailyData, dateRange.days)
+  const ga4Daily = sliceByDays(isFiltered ? countryGA4Data[countryKey] : ga4DailyData, dateRange.days)
+
+  const combinedTrend = gscDaily.map((g, i) => ({
+    date: g.date,
+    clicks:   g.clicks,
+    sessions: ga4Daily[i]?.sessions ?? 0,
+  }))
+
   return (
     <div className="space-y-6">
-      {/* Welcome banner */}
+      {/* Header banner */}
       <div
         className="rounded-xl p-6 text-white"
         style={{ background: `linear-gradient(135deg, ${ACCENT} 0%, #e07800 100%)` }}
@@ -47,69 +59,88 @@ export default function OverviewDashboard() {
         <div className="flex items-start justify-between">
           <div>
             <h2 className="text-xl font-bold mb-1">Good morning 👋</h2>
-            <p className="text-orange-100 text-sm">Here's your analytics snapshot for the last 30 days.</p>
+            <p className="text-orange-100 text-sm">
+              {isFiltered
+                ? `Analytics snapshot for ${country} · ${dateRange.label}`
+                : `Here's your analytics snapshot for the last ${dateRange.label}.`}
+            </p>
           </div>
           <div className="hidden sm:flex items-center gap-6">
             <div className="text-center">
-              <p className="text-2xl font-bold">{(gscSummary.totalClicks / 1000).toFixed(1)}K</p>
+              <p className="text-2xl font-bold">{(gsc.totalClicks / 1000).toFixed(1)}K</p>
               <p className="text-xs text-orange-200">Organic Clicks</p>
             </div>
             <div className="w-px h-10 bg-orange-300 opacity-40" />
             <div className="text-center">
-              <p className="text-2xl font-bold">{(ga4Summary.totalSessions / 1000).toFixed(1)}K</p>
+              <p className="text-2xl font-bold">{(ga4.totalSessions / 1000).toFixed(1)}K</p>
               <p className="text-xs text-orange-200">Total Sessions</p>
             </div>
             <div className="w-px h-10 bg-orange-300 opacity-40" />
             <div className="text-center">
-              <p className="text-2xl font-bold">{ga4Summary.totalConversions.toLocaleString()}</p>
+              <p className="text-2xl font-bold">{ga4.totalConversions.toLocaleString()}</p>
               <p className="text-xs text-orange-200">Conversions</p>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Country badge */}
+      {isFiltered && (
+        <div className="flex items-center gap-2">
+          <span className="bg-accent-50 text-accent text-xs font-semibold px-3 py-1 rounded-full border border-accent-200">
+            {country} data
+          </span>
+        </div>
+      )}
+
       {/* KPI grid */}
       <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <KPICard
           title="Organic Clicks"
-          value={gscSummary.totalClicks.toLocaleString()}
-          change={gscSummary.clicksChange}
+          value={gsc.totalClicks.toLocaleString()}
+          change={gsc.clicksChange}
           icon={<MousePointerClick size={18} className="text-accent" />}
           iconBg="bg-accent-50"
         />
         <KPICard
           title="Impressions"
-          value={(gscSummary.totalImpressions / 1_000_000).toFixed(2) + 'M'}
-          change={gscSummary.impressionsChange}
+          value={gsc.totalImpressions >= 1_000_000
+            ? (gsc.totalImpressions / 1_000_000).toFixed(2) + 'M'
+            : (gsc.totalImpressions / 1_000).toFixed(0) + 'K'}
+          change={gsc.impressionsChange}
           icon={<Eye size={18} className="text-blue-500" />}
           iconBg="bg-blue-50"
         />
         <KPICard
           title="Sessions"
-          value={(ga4Summary.totalSessions / 1000).toFixed(1) + 'K'}
-          change={ga4Summary.sessionsChange}
+          value={ga4.totalSessions >= 1_000
+            ? (ga4.totalSessions / 1_000).toFixed(1) + 'K'
+            : ga4.totalSessions.toLocaleString()}
+          change={ga4.sessionsChange}
           icon={<Activity size={18} className="text-emerald-500" />}
           iconBg="bg-emerald-50"
         />
         <KPICard
           title="Total Users"
-          value={(ga4Summary.totalUsers / 1000).toFixed(1) + 'K'}
-          change={ga4Summary.usersChange}
+          value={ga4.totalUsers >= 1_000
+            ? (ga4.totalUsers / 1_000).toFixed(1) + 'K'
+            : ga4.totalUsers.toLocaleString()}
+          change={ga4.usersChange}
           icon={<Users size={18} className="text-purple-500" />}
           iconBg="bg-purple-50"
         />
         <KPICard
           title="Avg CTR"
-          value={gscSummary.avgCtr.toFixed(2)}
+          value={gsc.avgCtr.toFixed(2)}
           suffix="%"
-          change={gscSummary.ctrChange}
+          change={gsc.ctrChange}
           icon={<TrendingUp size={18} className="text-pink-500" />}
           iconBg="bg-pink-50"
         />
         <KPICard
           title="Conversions"
-          value={ga4Summary.totalConversions.toLocaleString()}
-          change={ga4Summary.conversionsChange}
+          value={ga4.totalConversions.toLocaleString()}
+          change={ga4.conversionsChange}
           icon={<Target size={18} className="text-amber-500" />}
           iconBg="bg-amber-50"
         />
@@ -119,12 +150,12 @@ export default function OverviewDashboard() {
       <div className="card p-5">
         <SectionHeader
           title="Clicks vs Sessions"
-          description="Organic search clicks (GSC) compared to GA4 sessions — 30-day overview"
+          description={`Organic search clicks (GSC) vs GA4 sessions · ${dateRange.label}${isFiltered ? ` · ${country}` : ''}`}
         />
         <ResponsiveContainer width="100%" height={260}>
           <LineChart data={combinedTrend} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} interval={4} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} interval={Math.floor(combinedTrend.length / 6)} />
             <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Line type="monotone" dataKey="clicks"   stroke={ACCENT} strokeWidth={2} dot={false} name="Organic Clicks" />
@@ -174,17 +205,47 @@ export default function OverviewDashboard() {
           </div>
         </div>
 
-        {/* Quick stats */}
+        {/* Key highlights */}
         <div className="card p-5">
           <SectionHeader title="Key Highlights" description="Performance at a glance" />
           <div className="space-y-3">
             {[
-              { label: 'Avg. Search Position', value: `${gscSummary.avgPosition}`, badge: '↓ improved', positive: true },
-              { label: 'Avg. Session Duration', value: ga4Summary.avgSessionDuration, badge: '', positive: true },
-              { label: 'Bounce Rate', value: `${ga4Summary.avgBounceRate}%`, badge: `${Math.abs(ga4Summary.bounceRateChange)}% ↓`, positive: true },
-              { label: 'New Users Share', value: `${((ga4Summary.newUsers / ga4Summary.totalUsers) * 100).toFixed(1)}%`, badge: '', positive: true },
-              { label: 'Organic Click-through', value: `${gscSummary.avgCtr}%`, badge: `+${gscSummary.ctrChange}%`, positive: true },
-              { label: 'Conv. Rate (est.)', value: `${((ga4Summary.totalConversions / ga4Summary.totalSessions) * 100).toFixed(2)}%`, badge: `+${ga4Summary.conversionsChange}%`, positive: true },
+              {
+                label: 'Avg. Search Position',
+                value: `${gsc.avgPosition}`,
+                badge: '↓ improved',
+                positive: true,
+              },
+              {
+                label: 'Avg. Session Duration',
+                value: ga4.avgSessionDuration,
+                badge: '',
+                positive: true,
+              },
+              {
+                label: 'Bounce Rate',
+                value: `${ga4.avgBounceRate}%`,
+                badge: `${Math.abs(ga4.bounceRateChange)}% ↓`,
+                positive: true,
+              },
+              {
+                label: 'New Users Share',
+                value: `${((ga4.newUsers / ga4.totalUsers) * 100).toFixed(1)}%`,
+                badge: '',
+                positive: true,
+              },
+              {
+                label: 'Organic Click-through',
+                value: `${gsc.avgCtr}%`,
+                badge: `+${gsc.ctrChange}%`,
+                positive: true,
+              },
+              {
+                label: 'Conv. Rate (est.)',
+                value: `${((ga4.totalConversions / ga4.totalSessions) * 100).toFixed(2)}%`,
+                badge: `+${ga4.conversionsChange}%`,
+                positive: true,
+              },
             ].map((item) => (
               <div key={item.label} className="flex items-center justify-between py-1 border-b border-gray-50 last:border-0">
                 <span className="text-sm text-gray-600">{item.label}</span>
