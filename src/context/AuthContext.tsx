@@ -1,81 +1,146 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
+import {
+  signInWithPopup, signOut as firebaseSignOut,
+  onAuthStateChanged, updateProfile, User as FirebaseUser,
+} from 'firebase/auth'
+import {
+  doc, getDoc, setDoc, updateDoc, serverTimestamp,
+  collection, query, where, getDocs, writeBatch,
+} from 'firebase/firestore'
+import { auth, db, googleProvider } from '../config/firebase'
 
-export interface User {
-  email: string
-  name: string
-  domain: 'bandaholdings' | '5dm'
+export type UserRole = 'super_admin' | 'admin' | 'member'
+
+export interface AppUser {
+  uid:        string
+  email:      string
+  name:       string
+  photoURL:   string
+  role:       UserRole
+  invitedBy?: string
 }
 
 interface AuthContextType {
-  user: User | null
-  login: (email: string, password: string) => Promise<{ error?: string }>
-  logout: () => void
-  loading: boolean
+  user:              AppUser | null
+  loading:           boolean
+  accessDenied:      boolean
+  signInWithGoogle:  () => Promise<void>
+  signOut:           () => Promise<void>
+  updateUserProfile: (data: { name?: string; photoURL?: string }) => Promise<void>
 }
 
-const ALLOWED_DOMAINS = ['5dm.africa', 'bandaholdings.com']
-const DASHBOARD_PASSWORD = 'Bandabets'
-const SESSION_KEY = 'banda_dash_session'
-
+export const SUPER_ADMIN_EMAIL = 'goga@5dm.africa'
 const AuthContext = createContext<AuthContextType | null>(null)
 
-function parseName(email: string): string {
-  const local = email.split('@')[0]
-  return local
-    .replace(/[._-]/g, ' ')
-    .split(' ')
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
+async function resolveUserAccess(fbUser: FirebaseUser): Promise<AppUser | 'denied'> {
+  const ref  = doc(db, 'users', fbUser.uid)
+  const snap = await getDoc(ref)
+
+  // Super admin always gets in
+  if (fbUser.email === SUPER_ADMIN_EMAIL) {
+    const existing = snap.exists() ? snap.data() : {}
+    const data: AppUser = {
+      uid:      fbUser.uid,
+      email:    fbUser.email!,
+      name:     existing.name     ?? fbUser.displayName ?? 'Goga',
+      photoURL: existing.photoURL ?? fbUser.photoURL    ?? '',
+      role:     'super_admin',
+    }
+    await setDoc(ref, { ...data, updatedAt: serverTimestamp() }, { merge: true })
+    return data
+  }
+
+  // Existing authorised user
+  if (snap.exists()) {
+    const d = snap.data()
+    return {
+      uid:       fbUser.uid,
+      email:     fbUser.email!,
+      name:      d.name      ?? fbUser.displayName ?? '',
+      photoURL:  d.photoURL  ?? fbUser.photoURL    ?? '',
+      role:      d.role      as UserRole,
+      invitedBy: d.invitedBy,
+    }
+  }
+
+  // Check for a pending invitation matching this email
+  const invQ    = query(
+    collection(db, 'invitations'),
+    where('email',  '==', fbUser.email),
+    where('status', '==', 'pending'),
+  )
+  const invSnap = await getDocs(invQ)
+  if (!invSnap.empty) {
+    const inv      = invSnap.docs[0]
+    const invData  = inv.data()
+    const userData: AppUser = {
+      uid:       fbUser.uid,
+      email:     fbUser.email!,
+      name:      fbUser.displayName ?? '',
+      photoURL:  fbUser.photoURL    ?? '',
+      role:      invData.role       as UserRole,
+      invitedBy: invData.invitedBy,
+    }
+    const batch = writeBatch(db)
+    batch.set(ref, { ...userData, createdAt: serverTimestamp() })
+    batch.update(inv.ref, { status: 'accepted', acceptedAt: serverTimestamp() })
+    await batch.commit()
+    return userData
+  }
+
+  return 'denied'
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
+  const [user,         setUser]         = useState<AppUser | null>(null)
+  const [loading,      setLoading]      = useState(true)
+  const [accessDenied, setAccessDenied] = useState(false)
 
   useEffect(() => {
-    const stored = localStorage.getItem(SESSION_KEY)
-    if (stored) {
-      try {
-        setUser(JSON.parse(stored))
-      } catch {
-        localStorage.removeItem(SESSION_KEY)
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      if (!fbUser) {
+        setUser(null); setAccessDenied(false); setLoading(false)
+        return
       }
-    }
-    setLoading(false)
+      try {
+        const result = await resolveUserAccess(fbUser)
+        if (result === 'denied') { setUser(null); setAccessDenied(true) }
+        else                     { setUser(result); setAccessDenied(false) }
+      } catch {
+        setUser(null); setAccessDenied(false)
+      } finally {
+        setLoading(false)
+      }
+    })
+    return unsub
   }, [])
 
-  const login = async (email: string, password: string): Promise<{ error?: string }> => {
-    const trimmed = email.trim().toLowerCase()
-    const domain = trimmed.split('@')[1]
-
-    if (!domain || !ALLOWED_DOMAINS.includes(domain)) {
-      return { error: 'Access restricted to @5dm.africa and @bandaholdings.com accounts.' }
-    }
-
-    if (password !== DASHBOARD_PASSWORD) {
-      return { error: 'Incorrect password. Please try again.' }
-    }
-
-    // Simulate network delay
-    await new Promise((r) => setTimeout(r, 600))
-
-    const newUser: User = {
-      email: trimmed,
-      name: parseName(trimmed),
-      domain: domain === '5dm.africa' ? '5dm' : 'bandaholdings',
-    }
-
-    localStorage.setItem(SESSION_KEY, JSON.stringify(newUser))
-    setUser(newUser)
-    return {}
+  const signInWithGoogle = async () => {
+    setLoading(true)
+    try { await signInWithPopup(auth, googleProvider) }
+    catch (e) { setLoading(false); throw e }
   }
 
-  const logout = () => {
-    localStorage.removeItem(SESSION_KEY)
-    setUser(null)
+  const signOut = async () => {
+    await firebaseSignOut(auth)
+    setUser(null); setAccessDenied(false)
   }
 
-  return <AuthContext.Provider value={{ user, login, logout, loading }}>{children}</AuthContext.Provider>
+  const updateUserProfile = async (data: { name?: string; photoURL?: string }) => {
+    if (!user || !auth.currentUser) return
+    await updateProfile(auth.currentUser, {
+      displayName: data.name     ?? auth.currentUser.displayName,
+      photoURL:    data.photoURL ?? auth.currentUser.photoURL,
+    })
+    await updateDoc(doc(db, 'users', user.uid), { ...data, updatedAt: serverTimestamp() })
+    setUser({ ...user, ...data })
+  }
+
+  return (
+    <AuthContext.Provider value={{ user, loading, accessDenied, signInWithGoogle, signOut, updateUserProfile }}>
+      {children}
+    </AuthContext.Provider>
+  )
 }
 
 export function useAuth() {

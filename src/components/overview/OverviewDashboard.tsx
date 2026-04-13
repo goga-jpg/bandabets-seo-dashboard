@@ -1,4 +1,4 @@
-import { MousePointerClick, Eye, Users, Target, TrendingUp, Activity } from 'lucide-react'
+import { MousePointerClick, Eye, Users, Target, TrendingUp, Activity, Percent } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
   ResponsiveContainer, PieChart, Pie, Cell,
@@ -15,6 +15,14 @@ import { useFilters, sliceByDays } from '../../context/FilterContext'
 
 const ACCENT = '#fa9602'
 const BLUE = '#3b82f6'
+
+function getGreeting(): string {
+  const h = new Date().getHours()
+  if (h >= 5  && h < 12) return 'Good morning'
+  if (h >= 12 && h < 17) return 'Good afternoon'
+  if (h >= 17 && h < 21) return 'Good evening'
+  return 'Good night'
+}
 
 const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?: {name: string; value: number; color: string}[]; label?: string }) => {
   if (!active || !payload?.length) return null
@@ -58,7 +66,7 @@ export default function OverviewDashboard() {
       >
         <div className="flex items-start justify-between">
           <div>
-            <h2 className="text-xl font-bold mb-1">Good morning 👋</h2>
+            <h2 className="text-xl font-bold mb-1">{getGreeting()} 👋</h2>
             <p className="text-orange-100 text-sm">
               {isFiltered
                 ? `Analytics snapshot for ${country} · ${dateRange.label}`
@@ -94,7 +102,7 @@ export default function OverviewDashboard() {
       )}
 
       {/* KPI grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 xl:grid-cols-7 gap-4">
         <KPICard
           title="Organic Clicks"
           value={gsc.totalClicks.toLocaleString()}
@@ -143,6 +151,14 @@ export default function OverviewDashboard() {
           change={ga4.conversionsChange}
           icon={<Target size={18} className="text-amber-500" />}
           iconBg="bg-amber-50"
+        />
+        <KPICard
+          title="Engagement Rate"
+          value={(100 - ga4.avgBounceRate).toFixed(1)}
+          suffix="%"
+          change={ga4.bounceRateChange !== undefined ? +(Math.abs(ga4.bounceRateChange)).toFixed(1) : undefined}
+          icon={<Percent size={18} className="text-teal-500" />}
+          iconBg="bg-teal-50"
         />
       </div>
 

@@ -9,7 +9,7 @@ interface HeaderProps {
 }
 
 export default function Header({ title, subtitle }: HeaderProps) {
-  const { user, logout } = useAuth()
+  const { user, signOut: logout } = useAuth()
   const {
     country, setCountry,
     dateRange, setDateRange,

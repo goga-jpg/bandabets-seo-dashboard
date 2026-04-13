@@ -1,8 +1,9 @@
 import { useState } from 'react'
 import {
   LayoutDashboard, Search, BarChart3, TrendingUp,
-  Globe, ChevronLeft, ChevronRight, Settings, HelpCircle,
+  Globe, ChevronLeft, ChevronRight, Settings,
   Smartphone, Monitor, Crosshair, Sparkles, FileSearch,
+  Users, UserCircle2, FileBarChart2,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -17,6 +18,9 @@ export type ActiveView =
   | 'apk'
   | 'trends'
   | 'insights'
+  | 'page-insights'
+  | 'users'
+  | 'profile'
 
 interface SidebarProps {
   activeView: ActiveView
@@ -24,26 +28,28 @@ interface SidebarProps {
 }
 
 const analyticsNav = [
-  { id: 'overview'          as ActiveView, icon: LayoutDashboard, label: 'Overview'           },
-  { id: 'gsc'               as ActiveView, icon: Search,          label: 'Search Console'      },
-  { id: 'ga4'               as ActiveView, icon: BarChart3,       label: 'GA4 Analytics'       },
-  { id: 'yandex'            as ActiveView, icon: Globe,           label: 'Yandex Metrica'      },
-  { id: 'yandex-webmaster'  as ActiveView, icon: FileSearch,      label: 'Yandex Webmaster'    },
-  { id: 'bing'              as ActiveView, icon: Crosshair,       label: 'Bing Webmaster'      },
-  { id: 'clarity'           as ActiveView, icon: Monitor,         label: 'MS Clarity'          },
+  { id: 'overview'         as ActiveView, icon: LayoutDashboard, label: 'Overview'          },
+  { id: 'gsc'              as ActiveView, icon: Search,          label: 'Search Console'     },
+  { id: 'ga4'              as ActiveView, icon: BarChart3,       label: 'GA4 Analytics'      },
+  { id: 'page-insights'    as ActiveView, icon: FileBarChart2,   label: 'Page Insights'      },
+  { id: 'yandex'           as ActiveView, icon: Globe,           label: 'Yandex Metrica'     },
+  { id: 'yandex-webmaster' as ActiveView, icon: FileSearch,      label: 'Yandex Webmaster'   },
+  { id: 'bing'             as ActiveView, icon: Crosshair,       label: 'Bing Webmaster'     },
+  { id: 'clarity'          as ActiveView, icon: Monitor,         label: 'MS Clarity'         },
 ]
 
 const toolsNav = [
-  { id: 'apk'      as ActiveView, icon: Smartphone,  label: 'APK Downloads'  },
-  { id: 'trends'   as ActiveView, icon: TrendingUp,  label: 'Trends'         },
-  { id: 'insights' as ActiveView, icon: Sparkles,    label: 'AI Insights'    },
+  { id: 'apk'     as ActiveView, icon: Smartphone, label: 'APK Downloads' },
+  { id: 'trends'  as ActiveView, icon: TrendingUp, label: 'Trends'        },
+  { id: 'insights'as ActiveView, icon: Sparkles,   label: 'AI Insights'   },
 ]
 
 export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const { user } = useAuth()
+  const canManageUsers = user?.role === 'super_admin' || user?.role === 'admin'
 
-  const NavItem = ({ id, icon: Icon, label }: { id: ActiveView; icon: React.ElementType; label: string }) => (
+  const NavItem = ({ id, icon: Icon, label, badge }: { id: ActiveView; icon: React.ElementType; label: string; badge?: string }) => (
     <button
       onClick={() => onViewChange(id)}
       className={`nav-item w-full ${activeView === id ? 'active' : ''} ${collapsed ? 'justify-center px-2' : ''}`}
@@ -51,8 +57,8 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
     >
       <Icon size={17} className="shrink-0" />
       {!collapsed && <span>{label}</span>}
-      {!collapsed && id === 'insights' && (
-        <span className="ml-auto text-[10px] font-semibold bg-accent text-white px-1.5 py-0.5 rounded-full">AI</span>
+      {!collapsed && badge && (
+        <span className="ml-auto text-[10px] font-semibold bg-accent text-white px-1.5 py-0.5 rounded-full">{badge}</span>
       )}
     </button>
   )
@@ -74,23 +80,23 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
 
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-0.5 overflow-y-auto">
-        {!collapsed && (
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-4 pt-2 pb-1.5">
-            Analytics
-          </p>
-        )}
+        {!collapsed && <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-4 pt-2 pb-1.5">Analytics</p>}
         {collapsed && <div className="h-3" />}
-
         {analyticsNav.map((item) => <NavItem key={item.id} {...item} />)}
 
-        {!collapsed && (
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-4 pt-4 pb-1.5">
-            Tools
-          </p>
-        )}
+        {!collapsed && <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-4 pt-4 pb-1.5">Tools</p>}
         {collapsed && <div className="h-3" />}
+        {toolsNav.map((item) => (
+          <NavItem key={item.id} {...item} badge={item.id === 'insights' ? 'AI' : undefined} />
+        ))}
 
-        {toolsNav.map((item) => <NavItem key={item.id} {...item} />)}
+        {canManageUsers && (
+          <>
+            {!collapsed && <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 px-4 pt-4 pb-1.5">Admin</p>}
+            {collapsed && <div className="h-3" />}
+            <NavItem id="users" icon={Users} label="Manage Users" />
+          </>
+        )}
       </nav>
 
       {/* User + bottom */}
@@ -101,13 +107,13 @@ export default function Sidebar({ activeView, onViewChange }: SidebarProps) {
             <p className="text-[10px] text-gray-400 truncate">{user.email}</p>
           </div>
         )}
-        <button className={`nav-item w-full ${collapsed ? 'justify-center px-2' : ''}`} title={collapsed ? 'Settings' : undefined}>
+        <NavItem id="profile" icon={UserCircle2} label="Profile" />
+        <button
+          className={`nav-item w-full ${collapsed ? 'justify-center px-2' : ''}`}
+          title={collapsed ? 'Settings' : undefined}
+        >
           <Settings size={17} className="shrink-0" />
           {!collapsed && <span>Settings</span>}
-        </button>
-        <button className={`nav-item w-full ${collapsed ? 'justify-center px-2' : ''}`} title={collapsed ? 'Help' : undefined}>
-          <HelpCircle size={17} className="shrink-0" />
-          {!collapsed && <span>Help</span>}
         </button>
       </div>
 
