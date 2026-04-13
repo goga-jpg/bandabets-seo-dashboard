@@ -75,16 +75,26 @@ export const gscDailyData: GSCDailyMetric[] = [
 ]
 
 export const gscTopKeywords: GSCKeyword[] = [
-  { keyword: 'banda bets',             clicks: 8420,  impressions: 124000, ctr: 6.79, position: 2.1,  change: 340  },
-  { keyword: 'online sports betting',  clicks: 4180,  impressions: 98500,  ctr: 4.24, position: 8.4,  change: 210  },
-  { keyword: 'banda bets login',       clicks: 3960,  impressions: 52400,  ctr: 7.56, position: 1.8,  change: 180  },
-  { keyword: 'sports betting south africa', clicks: 2840, impressions: 87600, ctr: 3.24, position: 11.2, change: -90 },
-  { keyword: 'bet on football',        clicks: 2610,  impressions: 76200,  ctr: 3.43, position: 9.8,  change: 140  },
-  { keyword: 'live betting odds',      clicks: 2280,  impressions: 68400,  ctr: 3.33, position: 12.1, change: 95   },
-  { keyword: 'casino games online',    clicks: 1940,  impressions: 64800,  ctr: 2.99, position: 14.3, change: -45  },
-  { keyword: 'best betting site',      clicks: 1780,  impressions: 58200,  ctr: 3.06, position: 13.7, change: 62   },
-  { keyword: 'cricket betting',        clicks: 1620,  impressions: 51600,  ctr: 3.14, position: 10.5, change: 128  },
-  { keyword: 'football accumulator',   clicks: 1440,  impressions: 47800,  ctr: 3.01, position: 15.2, change: -28  },
+  { keyword: 'banda bets',                   clicks: 8420,  impressions: 124000, ctr: 6.79, position:  2.1, change:  340 },
+  { keyword: 'online sports betting',        clicks: 4180,  impressions:  98500, ctr: 4.24, position:  8.4, change:  210 },
+  { keyword: 'banda bets login',             clicks: 3960,  impressions:  52400, ctr: 7.56, position:  1.8, change:  180 },
+  { keyword: 'sports betting south africa',  clicks: 2840,  impressions:  87600, ctr: 3.24, position: 11.2, change:  -90 },
+  { keyword: 'bet on football',              clicks: 2610,  impressions:  76200, ctr: 3.43, position:  9.8, change:  140 },
+  { keyword: 'live betting odds',            clicks: 2280,  impressions:  68400, ctr: 3.33, position: 12.1, change:   95 },
+  { keyword: 'casino games online',          clicks: 1940,  impressions:  64800, ctr: 2.99, position: 14.3, change:  -45 },
+  { keyword: 'best betting site',            clicks: 1780,  impressions:  58200, ctr: 3.06, position: 13.7, change:   62 },
+  { keyword: 'cricket betting',              clicks: 1620,  impressions:  51600, ctr: 3.14, position: 10.5, change:  128 },
+  { keyword: 'football accumulator',         clicks: 1440,  impressions:  47800, ctr: 3.01, position: 15.2, change:  -28 },
+  { keyword: 'bet on cricket ipl',           clicks: 1280,  impressions:  44200, ctr: 2.90, position: 16.4, change:  340 },
+  { keyword: 'banda bets app download',      clicks: 1180,  impressions:  18600, ctr: 6.34, position:  3.2, change:  156 },
+  { keyword: 'football betting nigeria',     clicks: 1060,  impressions:  38400, ctr: 2.76, position: 14.8, change:   84 },
+  { keyword: 'premier league betting',       clicks:  980,  impressions:  42600, ctr: 2.30, position: 17.6, change:  210 },
+  { keyword: 'bet on basketball',            clicks:  860,  impressions:  34800, ctr: 2.47, position: 16.2, change:   45 },
+  { keyword: 'sports betting kenya',         clicks:  820,  impressions:  28600, ctr: 2.87, position: 13.4, change:   92 },
+  { keyword: 'online casino africa',         clicks:  760,  impressions:  32400, ctr: 2.35, position: 18.2, change:  -18 },
+  { keyword: 'live score betting',           clicks:  720,  impressions:  26800, ctr: 2.69, position: 14.8, change:   38 },
+  { keyword: 'betting tips today',           clicks:  680,  impressions:  38200, ctr: 1.78, position: 21.4, change:   62 },
+  { keyword: 'banda bets bonus',             clicks:  640,  impressions:  14200, ctr: 4.51, position:  5.6, change:   94 },
 ]
 
 export const gscTopPages: GSCPage[] = [
@@ -112,5 +122,55 @@ export const gscCountryData = [
   { country: 'Kenya',        clicks: 4820,  impressions: 128000, ctr: 3.77 },
   { country: 'Zimbabwe',     clicks: 2960,  impressions: 82400,  ctr: 3.59 },
   { country: 'Ghana',        clicks: 2180,  impressions: 68200,  ctr: 3.20 },
+  { country: 'Uganda',       clicks: 1840,  impressions: 48600,  ctr: 3.79 },
+  { country: 'Congo (DRC)',  clicks: 1480,  impressions: 42200,  ctr: 3.51 },
   { country: 'Other',        clicks: 1320,  impressions: 55200,  ctr: 2.39 },
+]
+
+export const gscSearchAppearance = [
+  { type: 'Web results',    clicks: 36480, impressions: 924000, ctr: 3.95, color: '#fa9602' },
+  { type: 'Image search',   clicks:  6840, impressions: 198000, ctr: 3.45, color: '#3b82f6' },
+  { type: 'Video results',  clicks:  3240, impressions:  86400, ctr: 3.75, color: '#10b981' },
+  { type: 'News results',   clicks:  1760, impressions:  37400, ctr: 4.71, color: '#8b5cf6' },
+]
+
+export const gscCoreWebVitals = {
+  mobile: {
+    good:        68,
+    needsWork:   22,
+    poor:        10,
+    lcp:        '2.4s',
+    fid:         '84ms',
+    cls:         '0.08',
+  },
+  desktop: {
+    good:        84,
+    needsWork:   12,
+    poor:         4,
+    lcp:        '1.2s',
+    fid:         '42ms',
+    cls:         '0.04',
+  },
+}
+
+export const gscIndexCoverage = {
+  valid:           1284,
+  validWithWarning:  48,
+  excluded:         186,
+  error:             24,
+  notIndexedReasons: [
+    { reason: 'Crawled – not indexed',   count: 82 },
+    { reason: 'Discovered – not crawled',count: 56 },
+    { reason: 'Alternate page',          count: 28 },
+    { reason: 'Blocked by robots.txt',   count: 14 },
+    { reason: 'Soft 404',                count:  6 },
+  ],
+}
+
+export const gscCTRDistribution = [
+  { range: '0–1%',   pages: 284, color: '#ef4444' },
+  { range: '1–3%',   pages: 412, color: '#f97316' },
+  { range: '3–5%',   pages: 326, color: '#eab308' },
+  { range: '5–10%',  pages: 184, color: '#22c55e' },
+  { range: '10%+',   pages:  78, color: '#10b981' },
 ]

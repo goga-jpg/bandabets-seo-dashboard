@@ -8,6 +8,7 @@ import OverviewDashboard from './components/overview/OverviewDashboard'
 import GSCDashboard from './components/gsc/GSCDashboard'
 import GA4Dashboard from './components/ga4/GA4Dashboard'
 import YandexDashboard from './components/yandex/YandexDashboard'
+import YandexWebmasterDashboard from './components/yandex/YandexWebmasterDashboard'
 import BingDashboard from './components/bing/BingDashboard'
 import ClarityDashboard from './components/clarity/ClarityDashboard'
 import APKDashboard from './components/apk/APKDashboard'
@@ -15,15 +16,16 @@ import TrendsDashboard from './components/trends/TrendsDashboard'
 import AIInsights from './components/insights/AIInsights'
 
 const viewConfig: Record<ActiveView, { title: string; subtitle: string }> = {
-  overview: { title: 'Analytics Overview',       subtitle: 'Combined KPIs across all platforms' },
-  gsc:      { title: 'Google Search Console',    subtitle: 'Organic search performance, queries & pages' },
-  ga4:      { title: 'Google Analytics 4',       subtitle: 'Traffic, behaviour & conversions' },
-  yandex:   { title: 'Yandex Metrica',           subtitle: 'Visits, goals & traffic sources' },
-  bing:     { title: 'Bing Webmaster Tools',     subtitle: 'Bing search performance & index health' },
-  clarity:  { title: 'Microsoft Clarity',        subtitle: 'Session recordings, heatmaps & UX signals' },
-  apk:      { title: 'APK Downloads',            subtitle: 'App installs, versions & ratings by country' },
-  trends:   { title: 'Google Trends',            subtitle: 'Search interest over time & related queries' },
-  insights: { title: 'AI Insights',              subtitle: 'Automated analysis & recommendations from your data' },
+  overview:          { title: 'Analytics Overview',       subtitle: 'Combined KPIs across all platforms' },
+  gsc:               { title: 'Google Search Console',    subtitle: 'Organic search performance, queries & pages' },
+  ga4:               { title: 'Google Analytics 4',       subtitle: 'Traffic, behaviour & conversions' },
+  yandex:            { title: 'Yandex Metrica',           subtitle: 'Visits, goals & traffic sources' },
+  'yandex-webmaster':{ title: 'Yandex Webmaster',         subtitle: 'Index coverage, crawl health & Yandex search queries' },
+  bing:              { title: 'Bing Webmaster Tools',     subtitle: 'Bing search performance & index health' },
+  clarity:           { title: 'Microsoft Clarity',        subtitle: 'Session recordings, heatmaps & UX signals' },
+  apk:               { title: 'APK Downloads',            subtitle: 'App installs, versions & ratings by country' },
+  trends:            { title: 'Google Trends',            subtitle: 'Search interest over time & related queries' },
+  insights:          { title: 'AI Insights',              subtitle: 'Automated analysis & recommendations from your data' },
 }
 
 function WelcomeBanner({ name }: { name: string }) {
@@ -56,7 +58,8 @@ function Dashboard() {
             {activeView === 'overview' && <OverviewDashboard />}
             {activeView === 'gsc'      && <GSCDashboard />}
             {activeView === 'ga4'      && <GA4Dashboard />}
-            {activeView === 'yandex'   && <YandexDashboard />}
+            {activeView === 'yandex'            && <YandexDashboard />}
+            {activeView === 'yandex-webmaster'  && <YandexWebmasterDashboard />}
             {activeView === 'bing'     && <BingDashboard />}
             {activeView === 'clarity'  && <ClarityDashboard />}
             {activeView === 'apk'      && <APKDashboard />}

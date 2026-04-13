@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Users, Activity, Target, Clock, Smartphone, Monitor, Tablet } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
-  ResponsiveContainer, PieChart, Pie, Cell, Legend,
+  ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts'
 import KPICard from '../common/KPICard'
 import SectionHeader from '../common/SectionHeader'
@@ -11,6 +11,8 @@ import {
   ga4Summary, ga4DailyData, ga4Channels, ga4TopPages,
   ga4Events, ga4DeviceData, GA4Page, GA4Event, GA4Channel,
 } from '../../data/ga4Data'
+import { countryGA4Data, countrySummaryGA4 } from '../../data/countryData'
+import { useFilters, sliceByDays } from '../../context/FilterContext'
 
 const ACCENT = '#fa9602'
 const COLORS = ['#fa9602', '#f97316', '#3b82f6', '#8b5cf6', '#10b981', '#ec4899', '#6b7280']
@@ -67,6 +69,13 @@ const metricOptions: { key: DailyMetric; label: string; color: string }[] = [
 export default function GA4Dashboard() {
   const [activeMetrics, setActiveMetrics] = useState<DailyMetric[]>(['sessions', 'users'])
   const [activeTab, setActiveTab] = useState<'pages' | 'events'>('pages')
+  const { country, dateRange } = useFilters()
+
+  const isFiltered = country !== 'All'
+  const countryKey = country as keyof typeof countryGA4Data
+  const summary = isFiltered ? countrySummaryGA4[countryKey] : ga4Summary
+  const allDaily = isFiltered ? countryGA4Data[countryKey] : ga4DailyData
+  const dailyData = sliceByDays(allDaily, dateRange.days)
 
   const toggleMetric = (key: DailyMetric) => {
     setActiveMetrics((prev) =>
@@ -76,34 +85,43 @@ export default function GA4Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Country badge */}
+      {isFiltered && (
+        <div className="flex items-center gap-2">
+          <span className="bg-accent-50 text-accent text-xs font-semibold px-3 py-1 rounded-full border border-accent-200">
+            {country} data
+          </span>
+        </div>
+      )}
+
       {/* KPI cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <KPICard
           title="Total Sessions"
-          value={ga4Summary.totalSessions.toLocaleString()}
-          change={ga4Summary.sessionsChange}
+          value={summary.totalSessions.toLocaleString()}
+          change={summary.sessionsChange}
           icon={<Activity size={18} className="text-accent" />}
           iconBg="bg-accent-50"
         />
         <KPICard
           title="Total Users"
-          value={ga4Summary.totalUsers.toLocaleString()}
-          change={ga4Summary.usersChange}
+          value={summary.totalUsers.toLocaleString()}
+          change={summary.usersChange}
           icon={<Users size={18} className="text-blue-500" />}
           iconBg="bg-blue-50"
         />
         <KPICard
           title="Conversions"
-          value={ga4Summary.totalConversions.toLocaleString()}
-          change={ga4Summary.conversionsChange}
+          value={summary.totalConversions.toLocaleString()}
+          change={summary.conversionsChange}
           icon={<Target size={18} className="text-purple-500" />}
           iconBg="bg-purple-50"
         />
         <KPICard
           title="Bounce Rate"
-          value={ga4Summary.avgBounceRate.toFixed(1)}
+          value={summary.avgBounceRate.toFixed(1)}
           suffix="%"
-          change={ga4Summary.bounceRateChange}
+          change={summary.bounceRateChange}
           changeLabel="vs last period (lower = better)"
           invertChange
           icon={<Clock size={18} className="text-emerald-500" />}
@@ -113,7 +131,7 @@ export default function GA4Dashboard() {
 
       {/* Sessions trend */}
       <div className="card p-5">
-        <SectionHeader title="Traffic Trend" description="30-day sessions & users" />
+        <SectionHeader title="Traffic Trend" description={`${dateRange.label}${isFiltered ? ` · ${country}` : ''} · sessions & users`} />
 
         <div className="flex gap-2 mb-4 flex-wrap">
           {metricOptions.map(({ key, label, color }) => (
@@ -132,9 +150,9 @@ export default function GA4Dashboard() {
         </div>
 
         <ResponsiveContainer width="100%" height={280}>
-          <LineChart data={ga4DailyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
+          <LineChart data={dailyData} margin={{ top: 4, right: 8, left: 0, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#f3f4f6" />
-            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} interval={4} />
+            <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} interval={Math.floor(dailyData.length / 6)} />
             <YAxis tick={{ fontSize: 11, fill: '#9ca3af' }} tickLine={false} axisLine={false} />
             <Tooltip content={<CustomTooltip />} />
             {metricOptions.map(({ key, label, color }) =>

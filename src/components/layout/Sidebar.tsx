@@ -2,7 +2,7 @@ import { useState } from 'react'
 import {
   LayoutDashboard, Search, BarChart3, TrendingUp,
   Globe, ChevronLeft, ChevronRight, Settings, HelpCircle,
-  Smartphone, Monitor, Crosshair, Sparkles,
+  Smartphone, Monitor, Crosshair, Sparkles, FileSearch,
 } from 'lucide-react'
 import { useAuth } from '../../context/AuthContext'
 
@@ -11,6 +11,7 @@ export type ActiveView =
   | 'gsc'
   | 'ga4'
   | 'yandex'
+  | 'yandex-webmaster'
   | 'bing'
   | 'clarity'
   | 'apk'
@@ -23,12 +24,13 @@ interface SidebarProps {
 }
 
 const analyticsNav = [
-  { id: 'overview' as ActiveView, icon: LayoutDashboard, label: 'Overview'         },
-  { id: 'gsc'      as ActiveView, icon: Search,          label: 'Search Console'    },
-  { id: 'ga4'      as ActiveView, icon: BarChart3,        label: 'GA4 Analytics'    },
-  { id: 'yandex'   as ActiveView, icon: Globe,            label: 'Yandex Metrica'   },
-  { id: 'bing'     as ActiveView, icon: Crosshair,        label: 'Bing Webmaster'   },
-  { id: 'clarity'  as ActiveView, icon: Monitor,          label: 'MS Clarity'       },
+  { id: 'overview'          as ActiveView, icon: LayoutDashboard, label: 'Overview'           },
+  { id: 'gsc'               as ActiveView, icon: Search,          label: 'Search Console'      },
+  { id: 'ga4'               as ActiveView, icon: BarChart3,       label: 'GA4 Analytics'       },
+  { id: 'yandex'            as ActiveView, icon: Globe,           label: 'Yandex Metrica'      },
+  { id: 'yandex-webmaster'  as ActiveView, icon: FileSearch,      label: 'Yandex Webmaster'    },
+  { id: 'bing'              as ActiveView, icon: Crosshair,       label: 'Bing Webmaster'      },
+  { id: 'clarity'           as ActiveView, icon: Monitor,         label: 'MS Clarity'          },
 ]
 
 const toolsNav = [
