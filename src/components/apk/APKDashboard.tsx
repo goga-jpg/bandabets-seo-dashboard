@@ -1,11 +1,11 @@
-import { Download, Smartphone, Star, RefreshCcw } from 'lucide-react'
+import { Download, Smartphone, RefreshCcw } from 'lucide-react'
 import {
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid,
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell,
 } from 'recharts'
 import KPICard from '../common/KPICard'
 import SectionHeader from '../common/SectionHeader'
-import { apkSummary, apkDaily, apkByCountry, apkVersions, apkRatings } from '../../data/apkData'
+import { apkSummary, apkDaily, apkByCountry, apkVersions } from '../../data/apkData'
 import { useFilters, scale, sliceByDays } from '../../context/FilterContext'
 
 const ACCENT = '#fa9602'
@@ -28,19 +28,6 @@ const CustomTooltip = ({ active, payload, label }: { active?: boolean; payload?:
   )
 }
 
-function StarRating({ value }: { value: number }) {
-  return (
-    <div className="flex gap-0.5">
-      {[1, 2, 3, 4, 5].map((i) => (
-        <Star
-          key={i}
-          size={14}
-          className={i <= Math.round(value) ? 'text-accent fill-accent' : 'text-gray-200 fill-gray-200'}
-        />
-      ))}
-    </div>
-  )
-}
 
 export default function APKDashboard() {
   const { country, dateRange } = useFilters()
@@ -64,14 +51,6 @@ export default function APKDashboard() {
     { key: 'android', header: 'Android', align: 'right' as const, render: (r: typeof apkByCountry[0]) => r.android.toLocaleString() },
     { key: 'ios',     header: 'iOS',     align: 'right' as const, render: (r: typeof apkByCountry[0]) => r.ios.toLocaleString() },
     { key: 'total',   header: 'Total',   align: 'right' as const, render: (r: typeof apkByCountry[0]) => <span className="font-semibold">{r.total.toLocaleString()}</span> },
-  ]
-
-  const ratingBars = [
-    { stars: '5★', pct: apkRatings.five,  color: ANDROID_COLOR },
-    { stars: '4★', pct: apkRatings.four,  color: '#66bb6a' },
-    { stars: '3★', pct: apkRatings.three, color: '#ffa726' },
-    { stars: '2★', pct: apkRatings.two,   color: '#ef5350' },
-    { stars: '1★', pct: apkRatings.one,   color: '#e53935' },
   ]
 
   return (
@@ -144,28 +123,6 @@ export default function APKDashboard() {
         </div>
       </div>
 
-      {/* Ratings */}
-      <div className="card p-5">
-        <SectionHeader title="App Store Ratings" description="User ratings across app stores" />
-        <div className="flex items-center gap-8">
-          <div className="text-center">
-            <p className="text-4xl font-bold text-gray-900">{apkRatings.average}</p>
-            <StarRating value={apkRatings.average} />
-            <p className="text-xs text-gray-400 mt-1">{apkRatings.totalRatings.toLocaleString()} ratings</p>
-          </div>
-          <div className="flex-1 space-y-2">
-            {ratingBars.map((r) => (
-              <div key={r.stars} className="flex items-center gap-3 text-xs">
-                <span className="text-gray-500 w-4">{r.stars}</span>
-                <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-                  <div className="h-full rounded-full" style={{ width: `${r.pct}%`, background: r.color }} />
-                </div>
-                <span className="text-gray-500 w-8 text-right">{r.pct}%</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
     </div>
   )
 }

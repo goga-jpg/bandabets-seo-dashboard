@@ -7,7 +7,7 @@ import { yandexSummary } from '../data/yandexData'
 
 const API_KEY = 'AIzaSyCh2O44iFsuUkNZOe2J1hqhh07fT1lu4SY'
 const BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models'
-const MODEL    = 'gemini-1.5-flash'
+const MODEL    = 'gemini-2.0-flash'
 
 async function callGemini(prompt: string): Promise<string> {
   const url = `${BASE_URL}/${MODEL}:generateContent?key=${API_KEY}`
