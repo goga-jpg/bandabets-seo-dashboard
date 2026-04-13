@@ -14,6 +14,7 @@ interface AuthContextType {
 }
 
 const ALLOWED_DOMAINS = ['5dm.africa', 'bandaholdings.com']
+const DASHBOARD_PASSWORD = 'Bandabets'
 const SESSION_KEY = 'banda_dash_session'
 
 const AuthContext = createContext<AuthContextType | null>(null)
@@ -51,8 +52,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: 'Access restricted to @5dm.africa and @bandaholdings.com accounts.' }
     }
 
-    if (!password || password.length < 4) {
-      return { error: 'Please enter your password.' }
+    if (password !== DASHBOARD_PASSWORD) {
+      return { error: 'Incorrect password. Please try again.' }
     }
 
     // Simulate network delay
