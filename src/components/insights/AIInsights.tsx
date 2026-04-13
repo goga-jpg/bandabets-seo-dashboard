@@ -72,8 +72,9 @@ export default function AIInsights() {
     try {
       const result = await generateInsightsFromGemini(country, displayLabel)
       setInsights(result)
-    } catch (e) {
-      setAiError('Could not reach Gemini API. Showing cached insights.')
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Unknown error'
+      setAiError(`Gemini error: ${msg}. Showing cached insights.`)
       setInsights(FALLBACK)
     } finally {
       setLoadingAI(false)
@@ -96,10 +97,11 @@ export default function AIInsights() {
         ...prev.slice(0, -1),
         { role: 'assistant', content: answer },
       ])
-    } catch {
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : 'Unknown error'
       setMessages((prev) => [
         ...prev.slice(0, -1),
-        { role: 'assistant', content: 'Sorry, I couldn\'t get a response. Please check your connection and try again.' },
+        { role: 'assistant', content: `Gemini error: ${msg}` },
       ])
     } finally {
       setChatLoading(false)
