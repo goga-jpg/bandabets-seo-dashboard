@@ -9,6 +9,9 @@ import { apkSummary, apkByCountry }                  from '../data/apkData'
 import { claritySummary, clarityHeatmapInsights }    from '../data/clarityData'
 import { bingSummary }                               from '../data/bingData'
 import { yandexSummary }                             from '../data/yandexData'
+import { countrySummaryGSC, countrySummaryGA4 }      from '../data/countryData'
+
+type CountryKey = keyof typeof countrySummaryGSC
 
 async function callGemini(prompt: string, retries = 2): Promise<string> {
   const url = `${BASE_URL}/${MODEL}:generateContent?key=${API_KEY}`
@@ -50,6 +53,13 @@ async function callGemini(prompt: string, retries = 2): Promise<string> {
 }
 
 function buildContext(country: string, dateRange: string): string {
+  const isFiltered = country !== 'All'
+  const ck = country as CountryKey
+
+  // Use country-specific GSC/GA4 stats when filtered
+  const gsc = isFiltered ? countrySummaryGSC[ck] : gscSummary
+  const ga4 = isFiltered ? countrySummaryGA4[ck] : ga4Summary
+
   const topKw     = gscTopKeywords.slice(0, 5).map(k => `${k.keyword} (${k.clicks} clicks, pos ${k.position})`).join(', ')
   const topPages  = gscTopPages.slice(0, 5).map(p => `${p.url} (${p.clicks} clicks)`).join(', ')
   const topCh     = ga4Channels.slice(0, 4).map(c => `${c.channel}: ${c.sessions} sessions, ${c.convRate}% conv`).join(' | ')
@@ -57,17 +67,21 @@ function buildContext(country: string, dateRange: string): string {
   const apkCtry   = apkByCountry.map(c => `${c.country}: ${c.total}`).join(', ')
   const heatmap   = clarityHeatmapInsights.map(h => `${h.page}: ${h.insight}`).join('; ')
 
+  const impressionsStr = gsc.totalImpressions >= 1e6
+    ? `${(gsc.totalImpressions / 1e6).toFixed(2)}M`
+    : `${(gsc.totalImpressions / 1e3).toFixed(0)}K`
+
   return `You are a senior digital analytics consultant for BandaBets, a sports betting platform in Africa.
 
 FILTERS ACTIVE: Country = ${country} | Period = ${dateRange}
 
-GOOGLE SEARCH CONSOLE:
-Clicks: ${gscSummary.totalClicks.toLocaleString()} (+${gscSummary.clicksChange}%) | Impressions: ${(gscSummary.totalImpressions/1e6).toFixed(2)}M | CTR: ${gscSummary.avgCtr}% | Avg Position: ${gscSummary.avgPosition}
+GOOGLE SEARCH CONSOLE${isFiltered ? ` (${country} only)` : ''}:
+Clicks: ${gsc.totalClicks.toLocaleString()} (+${gsc.clicksChange}%) | Impressions: ${impressionsStr} | CTR: ${gsc.avgCtr}% | Avg Position: ${gsc.avgPosition}
 Top queries: ${topKw}
 Top pages: ${topPages}
 
-GOOGLE ANALYTICS 4:
-Sessions: ${ga4Summary.totalSessions.toLocaleString()} (+${ga4Summary.sessionsChange}%) | Users: ${ga4Summary.totalUsers.toLocaleString()} | Conversions: ${ga4Summary.totalConversions.toLocaleString()} (+${ga4Summary.conversionsChange}%) | Bounce: ${ga4Summary.avgBounceRate}%
+GOOGLE ANALYTICS 4${isFiltered ? ` (${country} only)` : ''}:
+Sessions: ${ga4.totalSessions.toLocaleString()} (+${ga4.sessionsChange}%) | Users: ${ga4.totalUsers.toLocaleString()} | Conversions: ${ga4.totalConversions.toLocaleString()} (+${ga4.conversionsChange}%) | Bounce: ${ga4.avgBounceRate}%
 Channels: ${topCh} | Events: ${topEvents}
 
 BING: Clicks ${bingSummary.totalClicks.toLocaleString()} | CTR ${bingSummary.avgCtr}% | Pos ${bingSummary.avgPosition}

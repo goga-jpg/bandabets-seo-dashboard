@@ -64,9 +64,7 @@ export function FilterProvider({ children }: { children: ReactNode }) {
     })
   }
 
-  const displayLabel = dateRange.custom
-    ? dateRange.label
-    : dateRange.label
+  const displayLabel = dateRange.label
 
   return (
     <FilterContext.Provider value={{
