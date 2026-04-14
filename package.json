@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "build:zip": "tsc && vite build && cd dist && zip -r ../BandaBets-SEO-Dashboard.zip . && cd .. && echo \"✅ BandaBets-SEO-Dashboard.zip is ready to upload\""
+    "build:zip": "tsc && vite build && powershell -Command \"Compress-Archive -Path dist\\* -DestinationPath BandaBets-SEO-Dashboard.zip -Force\" && echo BandaBets-SEO-Dashboard.zip is ready to upload"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
