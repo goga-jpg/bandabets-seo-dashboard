@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import {
-  signInWithPopup, signOut as firebaseSignOut,
+  signInWithRedirect, signOut as firebaseSignOut, getRedirectResult,
   onAuthStateChanged, updateProfile, User as FirebaseUser,
 } from 'firebase/auth'
 import {
@@ -97,6 +97,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessDenied, setAccessDenied] = useState(false)
 
   useEffect(() => {
+    // Handle redirect result first (fires after Google redirects back)
+    getRedirectResult(auth).catch(() => {})
+
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
         setUser(null); setAccessDenied(false); setLoading(false)
@@ -117,7 +120,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     setLoading(true)
-    try { await signInWithPopup(auth, googleProvider) }
+    try { await signInWithRedirect(auth, googleProvider) }
     catch (e) { setLoading(false); throw e }
   }
 
