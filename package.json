@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:zip": "tsc && vite build && cd dist && zip -r ../BandaBets-SEO-Dashboard.zip . && cd .. && echo \"✅ BandaBets-SEO-Dashboard.zip is ready to upload\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

@@ -27,13 +27,13 @@ jobs:
         run: npm run build
 
       - name: Zip dist folder
-        run: cd dist && zip -r ../bandabets-seo-dashboard.zip . && cd ..
+        run: cd dist && zip -r ../BandaBets-SEO-Dashboard.zip . && cd ..
 
       - name: Upload zip as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: bandabets-seo-dashboard
-          path: bandabets-seo-dashboard.zip
+          name: BandaBets-SEO-Dashboard
+          path: BandaBets-SEO-Dashboard.zip
           retention-days: 30
 
       - name: Deploy to server via SSH
