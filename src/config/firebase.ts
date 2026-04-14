@@ -3,12 +3,12 @@ import { getAuth, GoogleAuthProvider } from 'firebase/auth'
 import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
-  apiKey:            import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain:        import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId:         import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket:     import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId:             import.meta.env.VITE_FIREBASE_APP_ID,
+  apiKey:            "AIzaSyBcLKj8iHB_LBUZJ4Z7vAp0MjVAR8_pfaQ",
+  authDomain:        "bandabets-dashboard.firebaseapp.com",
+  projectId:         "bandabets-dashboard",
+  storageBucket:     "bandabets-dashboard.firebasestorage.app",
+  messagingSenderId: "850863038178",
+  appId:             "1:850863038178:web:48ba0447a1f4ff310288bb",
 }
 
 export const app      = initializeApp(firebaseConfig)
