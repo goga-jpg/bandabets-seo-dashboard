@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react'
 import {
-  signInWithRedirect, signOut as firebaseSignOut, getRedirectResult,
+  signInWithPopup, signInWithRedirect, signOut as firebaseSignOut, getRedirectResult,
   onAuthStateChanged, updateProfile, User as FirebaseUser,
 } from 'firebase/auth'
 import {
@@ -31,11 +31,15 @@ interface AuthContextType {
 }
 
 export const SUPER_ADMIN_EMAIL = 'goga@5dm.africa'
+// Domains whose users are pre-approved as members (no individual invite needed)
+const APPROVED_DOMAINS = ['5dm.africa', 'bandaholdings.com']
 const AuthContext = createContext<AuthContextType | null>(null)
 
 async function resolveUserAccess(fbUser: FirebaseUser): Promise<AppUser | 'denied'> {
   const ref  = doc(db, 'users', fbUser.uid)
   const snap = await getDoc(ref)
+
+  const emailDomain = fbUser.email?.split('@')[1] ?? ''
 
   // Super admin always gets in
   if (fbUser.email === SUPER_ADMIN_EMAIL) {
@@ -62,6 +66,19 @@ async function resolveUserAccess(fbUser: FirebaseUser): Promise<AppUser | 'denie
       role:      d.role      as UserRole,
       invitedBy: d.invitedBy,
     }
+  }
+
+  // Auto-approve users from trusted domains (member role by default)
+  if (APPROVED_DOMAINS.includes(emailDomain)) {
+    const userData: AppUser = {
+      uid:      fbUser.uid,
+      email:    fbUser.email!,
+      name:     fbUser.displayName ?? '',
+      photoURL: fbUser.photoURL    ?? '',
+      role:     'member',
+    }
+    await setDoc(ref, { ...userData, createdAt: serverTimestamp() }, { merge: true })
+    return userData
   }
 
   // Check for a pending invitation matching this email
@@ -135,16 +152,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setLoading(true)
     setFirebaseError(null)
     try {
-      await signInWithRedirect(auth, googleProvider)
+      // Try popup first — faster UX; falls back to redirect if blocked
+      await signInWithPopup(auth, googleProvider)
     } catch (e: unknown) {
-      setLoading(false)
       const code = (e as { code?: string })?.code ?? ''
       if (code === 'auth/unauthorized-domain') {
+        setLoading(false)
         setFirebaseError(
-          `This domain is not authorised in Firebase. Go to Firebase Console → Authentication → Settings → Authorized domains and add: ${window.location.hostname}`
+          `Domain not authorised. Add "${window.location.hostname}" to Firebase Console → Authentication → Settings → Authorized domains.`
         )
         return
       }
+      // Popup was blocked or closed — fall back to redirect
+      if (code === 'auth/popup-blocked' || code === 'auth/popup-closed-by-user' || code === 'auth/cancelled-popup-request') {
+        try {
+          await signInWithRedirect(auth, googleProvider)
+        } catch (redirectErr: unknown) {
+          setLoading(false)
+          throw redirectErr
+        }
+        return
+      }
+      setLoading(false)
       throw e
     }
   }
