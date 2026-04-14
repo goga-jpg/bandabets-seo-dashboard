@@ -1,1 +1,37 @@
 
+name: Build & Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Zip dist folder
+        run: cd dist && zip -r ../BandaBets-SEO-Dashboard.zip . && cd ..
+
+      - name: Upload zip as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BandaBets-SEO-Dashboard
+          path: BandaBets-SEO-Dashboard.zip
+          retention-days: 30
