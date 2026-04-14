@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,7 +26,18 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Zip dist folder
+        run: cd dist && zip -r ../bandabets-seo-dashboard.zip . && cd ..
+
+      - name: Upload zip as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandabets-seo-dashboard
+          path: bandabets-seo-dashboard.zip
+          retention-days: 30
+
       - name: Deploy to server via SSH
+        if: ${{ secrets.SERVER_HOST != '' }}
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.SERVER_HOST }}
