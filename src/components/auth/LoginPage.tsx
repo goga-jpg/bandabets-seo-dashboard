@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useAuth } from '../../context/AuthContext'
 
 export default function LoginPage() {
-  const { signInWithGoogle, accessDenied } = useAuth()
+  const { signInWithGoogle, accessDenied, firebaseError } = useAuth()
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState('')
 
@@ -47,9 +47,10 @@ export default function LoginPage() {
             </div>
           )}
 
-          {error && (
-            <div className="mb-5 p-3 bg-yellow-50 border border-yellow-100 rounded-lg">
-              <p className="text-xs text-yellow-700">{error}</p>
+          {(firebaseError || error) && (
+            <div className="mb-5 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+              <p className="text-xs font-semibold text-yellow-800 mb-0.5">Configuration error</p>
+              <p className="text-xs text-yellow-700">{firebaseError ?? error}</p>
             </div>
           )}
 

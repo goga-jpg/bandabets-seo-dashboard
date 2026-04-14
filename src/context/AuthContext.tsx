@@ -24,6 +24,7 @@ interface AuthContextType {
   user:              AppUser | null
   loading:           boolean
   accessDenied:      boolean
+  firebaseError:     string | null
   signInWithGoogle:  () => Promise<void>
   signOut:           () => Promise<void>
   updateUserProfile: (data: { name?: string; photoURL?: string }) => Promise<void>
@@ -92,13 +93,20 @@ async function resolveUserAccess(fbUser: FirebaseUser): Promise<AppUser | 'denie
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user,         setUser]         = useState<AppUser | null>(null)
-  const [loading,      setLoading]      = useState(true)
-  const [accessDenied, setAccessDenied] = useState(false)
+  const [user,          setUser]          = useState<AppUser | null>(null)
+  const [loading,       setLoading]       = useState(true)
+  const [accessDenied,  setAccessDenied]  = useState(false)
+  const [firebaseError, setFirebaseError] = useState<string | null>(null)
 
   useEffect(() => {
     // Handle redirect result first (fires after Google redirects back)
-    getRedirectResult(auth).catch(() => {})
+    getRedirectResult(auth).catch((e: unknown) => {
+      const code = (e as { code?: string })?.code ?? ''
+      // Ignore popup-closed / cancelled; surface real config errors
+      if (code && !code.includes('popup-closed') && !code.includes('cancelled')) {
+        setFirebaseError(`Auth redirect error (${code}). Check Firebase authorized domains.`)
+      }
+    })
 
     const unsub = onAuthStateChanged(auth, async (fbUser) => {
       if (!fbUser) {
@@ -108,20 +116,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const result = await resolveUserAccess(fbUser)
         if (result === 'denied') { setUser(null); setAccessDenied(true) }
-        else                     { setUser(result); setAccessDenied(false) }
+        else                     { setUser(result); setAccessDenied(false); setFirebaseError(null) }
       } catch {
         setUser(null); setAccessDenied(false)
       } finally {
         setLoading(false)
       }
+    }, (err: unknown) => {
+      // onAuthStateChanged error — usually means Firebase config problem
+      const code = (err as { code?: string })?.code ?? 'unknown'
+      setFirebaseError(`Firebase auth error (${code}). Ensure this domain is in Firebase Auth → Authorized domains.`)
+      setLoading(false)
     })
     return unsub
   }, [])
 
   const signInWithGoogle = async () => {
     setLoading(true)
-    try { await signInWithRedirect(auth, googleProvider) }
-    catch (e) { setLoading(false); throw e }
+    setFirebaseError(null)
+    try {
+      await signInWithRedirect(auth, googleProvider)
+    } catch (e: unknown) {
+      setLoading(false)
+      const code = (e as { code?: string })?.code ?? ''
+      if (code === 'auth/unauthorized-domain') {
+        setFirebaseError(
+          `This domain is not authorised in Firebase. Go to Firebase Console → Authentication → Settings → Authorized domains and add: ${window.location.hostname}`
+        )
+        return
+      }
+      throw e
+    }
   }
 
   const signOut = async () => {
@@ -140,7 +165,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, accessDenied, signInWithGoogle, signOut, updateUserProfile }}>
+    <AuthContext.Provider value={{ user, loading, accessDenied, firebaseError, signInWithGoogle, signOut, updateUserProfile }}>
       {children}
     </AuthContext.Provider>
   )
