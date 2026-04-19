@@ -145,7 +145,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setFirebaseError(`Firebase auth error (${code}). Ensure this domain is in Firebase Auth → Authorized domains.`)
       setLoading(false)
     })
-    return unsub
+
+    // Silent connection health-check every 15 minutes.
+    // If the Firebase session token needs refreshing it is done in the
+    // background without triggering any popup or approval prompt. Any failure
+    // is swallowed — we never surface a consent UI here.
+    const healthCheck = async () => {
+      const current = auth.currentUser
+      if (!current) return
+      if (typeof navigator !== 'undefined' && navigator.onLine === false) return
+      try {
+        await current.getIdToken(true)
+      } catch {
+        // silent — do not prompt the user
+      }
+    }
+    const intervalId = window.setInterval(healthCheck, 15 * 60 * 1000)
+    const onOnline = () => void healthCheck()
+    window.addEventListener('online', onOnline)
+
+    return () => {
+      unsub()
+      window.clearInterval(intervalId)
+      window.removeEventListener('online', onOnline)
+    }
   }, [])
 
   const signInWithGoogle = async () => {

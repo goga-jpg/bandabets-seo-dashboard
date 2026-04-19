@@ -12,3 +12,14 @@ interface ImportMetaEnv {
 interface ImportMeta {
   readonly env: ImportMetaEnv
 }
+
+// Leaflet is loaded from CDN in index.html
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const L: any
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    L: any
+  }
+}
+export {}

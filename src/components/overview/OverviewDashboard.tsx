@@ -5,6 +5,7 @@ import {
 } from 'recharts'
 import KPICard from '../common/KPICard'
 import SectionHeader from '../common/SectionHeader'
+import LiveLocationMap from './LiveLocationMap'
 import { gscSummary, gscDailyData } from '../../data/gscData'
 import { ga4Summary, ga4DailyData, ga4Channels } from '../../data/ga4Data'
 import {
@@ -179,6 +180,9 @@ export default function OverviewDashboard() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* Live location map */}
+      <LiveLocationMap />
 
       {/* Two panels */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
