@@ -5,6 +5,7 @@ import PanelCreatives from './PanelCreatives';
 import PanelAssets from './PanelAssets';
 import PanelSchedule from './PanelSchedule';
 import PanelAnalytics from './PanelAnalytics';
+import BulkGenerate from './BulkGenerate';
 
 export default function MainContent({ activePanel }) {
   return (
@@ -15,6 +16,7 @@ export default function MainContent({ activePanel }) {
       {activePanel === 'assets' && <PanelAssets />}
       {activePanel === 'schedule' && <PanelSchedule />}
       {activePanel === 'analytics' && <PanelAnalytics />}
+      {activePanel === 'bulkgen' && <BulkGenerate />}
     </div>
   );
 }

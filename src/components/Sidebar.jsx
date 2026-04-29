@@ -13,8 +13,7 @@ export default function Sidebar({ onPanelSwitch, activePanel }) {
       <div className="sidebar-item">Mobile Banner 320×50 <span className="badge">0</span></div>
       <div className="sidebar-item">Wide Skyscraper 160×600 <span className="badge">0</span></div>
       <div className="sidebar-section-title">Quick Actions</div>
-      <div className="sidebar-item">Bulk Generate</div>
-      <div className="sidebar-item">Export All</div>
+      <div className={`sidebar-item${activePanel === 'bulkgen' ? ' active' : ''}`} onClick={() => onPanelSwitch('bulkgen')}>Bulk Generate & Export All</div>
     </div>
   );
 }
