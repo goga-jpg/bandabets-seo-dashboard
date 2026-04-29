@@ -1,4 +1,4 @@
-
+import { useRef, useState, useEffect } from 'react';
 import { useRef, useState, useEffect } from 'react';
 import './BulkGenerate.css';
 
@@ -29,6 +29,7 @@ const IAB_FORMATS = [
 ];
 
 export default function BulkGenerate() {
+  console.log('BulkGenerate component mounted');
   const [images, setImages] = useState([]);
   const [formats, setFormats] = useState(IAB_FORMATS);
   const [darkMode, setDarkMode] = useState(true);
@@ -78,6 +79,7 @@ export default function BulkGenerate() {
 
   return (
     <div className={darkMode ? 'bulkgen-section bulkgen-dark' : 'bulkgen-section bulkgen-light'}>
+      <div style={{color:'red',fontWeight:'bold'}}>BulkGenerate component loaded</div>
       <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
         <h2>Bulk Generate & Export All</h2>
         <button className="bulkgen-toggle-btn" onClick={()=>setDarkMode(d=>!d)}>
