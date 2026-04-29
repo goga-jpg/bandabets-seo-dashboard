@@ -15,23 +15,43 @@
     <!-- Global error/debug overlay for WSOD diagnosis -->
     <div id="global-error-overlay" style="display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);color:#fff;font-family:monospace;font-size:18px;padding:40px 20px;box-sizing:border-box;overflow:auto;"></div>
     <script>
+      function logWsodError(type, message, stack) {
+        var payload = {
+          timestamp: new Date().toISOString(),
+          type: type,
+          message: message,
+          stack: stack,
+          url: window.location.href,
+          userAgent: navigator.userAgent
+        };
+        // Try to POST to wsod-error-log.json (will only work if server allows it)
+        fetch('/wsod-error-log.json', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch(function(){});
+      }
       window.addEventListener('error', function(event) {
         var overlay = document.getElementById('global-error-overlay');
         overlay.style.display = 'block';
+        var msg = event.error ? (event.error.stack || event.error) : event.message;
         overlay.innerHTML = '<b>FATAL ERROR</b><br><br>' +
-          '<pre style="white-space:pre-wrap;word-break:break-all;">' + (event.error ? (event.error.stack || event.error) : event.message) + '</pre>' +
+          '<pre style="white-space:pre-wrap;word-break:break-all;">' + msg + '</pre>' +
           '<br><b>URL:</b> ' + window.location.href +
           '<br><b>User Agent:</b> ' + navigator.userAgent +
           '<br><br><b>Tip:</b> Screenshot this and send to your developer.';
+        logWsodError('error', event.message, msg);
       });
       window.addEventListener('unhandledrejection', function(event) {
         var overlay = document.getElementById('global-error-overlay');
         overlay.style.display = 'block';
+        var msg = (event.reason && event.reason.stack ? event.reason.stack : event.reason);
         overlay.innerHTML = '<b>UNHANDLED PROMISE REJECTION</b><br><br>' +
-          '<pre style="white-space:pre-wrap;word-break:break-all;">' + (event.reason && event.reason.stack ? event.reason.stack : event.reason) + '</pre>' +
+          '<pre style="white-space:pre-wrap;word-break:break-all;">' + msg + '</pre>' +
           '<br><b>URL:</b> ' + window.location.href +
           '<br><b>User Agent:</b> ' + navigator.userAgent +
           '<br><br><b>Tip:</b> Screenshot this and send to your developer.';
+        logWsodError('unhandledrejection', event.reason, msg);
       });
     </script>
     <script type="module" src="/src/main.jsx"></script>

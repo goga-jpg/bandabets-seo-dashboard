@@ -1,0 +1,10 @@
+// This file will be written to by the global error handler in production.
+// It will log fatal errors that cause WSOD for later review.
+
+// Usage: The error overlay in index.html will append errors here.
+// You can download or inspect this file after a WSOD event.
+
+// Format: Each error is appended as a JSON object, one per line.
+
+// Example entry:
+// { "timestamp": "2026-04-29T12:34:56Z", "type": "error", "message": "Uncaught ReferenceError: x is not defined", "stack": "...stack trace...", "url": "...", "userAgent": "..." }
