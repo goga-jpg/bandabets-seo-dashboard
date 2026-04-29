@@ -12,6 +12,7 @@ function App() {
 
   return (
     <div style={{height:'100vh',display:'flex',flexDirection:'column'}}>
+      <div style={{background:'#222',color:'#fff',padding:'4px',fontWeight:'bold'}}>App.jsx loaded</div>
       <Topbar onPanelSwitch={handlePanelSwitch} />
       <div className="app-body">
         <Sidebar onPanelSwitch={handlePanelSwitch} activePanel={activePanel} />

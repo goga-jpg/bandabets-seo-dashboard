@@ -10,6 +10,7 @@ import BulkGenerate from './BulkGenerate';
 export default function MainContent({ activePanel }) {
   return (
     <div className="main-content">
+      <div style={{background:'#444',color:'#fff',padding:'4px',fontWeight:'bold'}}>MainContent.jsx loaded</div>
       {activePanel === 'dashboard' && <PanelDashboard />}
       {activePanel === 'builder' && <PanelBuilder />}
       {activePanel === 'creatives' && <PanelCreatives />}
