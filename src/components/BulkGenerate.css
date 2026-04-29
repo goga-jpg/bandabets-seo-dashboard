@@ -2,12 +2,20 @@
   max-width: 700px;
   margin: 2rem auto;
   padding: 2rem 1.5rem;
-  background: #fff;
   border-radius: 18px;
   box-shadow: 0 4px 24px rgba(0,0,0,0.07);
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  font-family: 'Poppins', sans-serif;
+}
+.bulkgen-dark {
+  background: #181c24;
+  color: #fff;
+}
+.bulkgen-light {
+  background: #fff;
+  color: #222;
 }
 .bulkgen-upload {
   display: flex;
@@ -27,6 +35,22 @@
 }
 .bulkgen-upload-btn:hover {
   background: #fa9602;
+}
+.bulkgen-toggle-btn {
+  background: transparent;
+  border: 1px solid #aa3bff;
+  color: #aa3bff;
+  border-radius: 8px;
+  padding: 0.4rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  margin-left: 1rem;
+  transition: background 0.2s, color 0.2s;
+}
+.bulkgen-toggle-btn:hover {
+  background: #aa3bff;
+  color: #fff;
 }
 .bulkgen-uploaded {
   display: flex;
@@ -62,12 +86,12 @@
   margin-top: 0.5rem;
 }
 .bulkgen-format {
-  background: #fff;
+  background: inherit;
   border: 1px solid #e5e4e7;
   border-radius: 6px;
   padding: 0.4rem 1rem;
   font-size: 1rem;
-  color: #222;
+  color: inherit;
   font-weight: 500;
 }
 .bulkgen-export-btn {
@@ -79,8 +103,8 @@
   font-size: 1.1rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 1.5rem;
-  align-self: flex-end;
+  margin-top: 0;
+  align-self: flex-start;
   transition: background 0.2s;
 }
 .bulkgen-export-btn:hover {
