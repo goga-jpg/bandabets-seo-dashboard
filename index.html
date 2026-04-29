@@ -13,7 +13,13 @@
     <div id="root"></div>
     <!-- Use main.jsx for compatibility -->
     <!-- Global error/debug overlay for WSOD diagnosis -->
-    <div id="global-error-overlay" style="display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);color:#fff;font-family:monospace;font-size:18px;padding:40px 20px;box-sizing:border-box;overflow:auto;"></div>
+    <div id="global-error-overlay" style="display:block;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.97);color:#b00020;font-family:monospace;font-size:1.2rem;padding:2rem;overflow:auto;">
+      <b>Loading...</b><br><br>
+      If you see this message and nothing else, a fatal error may have occurred before the app could render.<br>
+      If an error is detected, details will appear here automatically.<br>
+      <br>
+      <b>Tip:</b> If this message does not disappear, please screenshot this page and send it to your developer.
+    </div>
     <script>
       function logWsodError(type, message, stack) {
         var payload = {
@@ -52,6 +58,15 @@
           '<br><b>User Agent:</b> ' + navigator.userAgent +
           '<br><br><b>Tip:</b> Screenshot this and send to your developer.';
         logWsodError('unhandledrejection', event.reason, msg);
+      });
+      // Hide overlay if React app loads successfully
+      window.addEventListener('DOMContentLoaded', function() {
+        setTimeout(function() {
+          var overlay = document.getElementById('global-error-overlay');
+          if (window.__REACT_APP_LOADED__) {
+            overlay.style.display = 'none';
+          }
+        }, 2000);
       });
     </script>
     <script type="module" src="/src/main.jsx"></script>
