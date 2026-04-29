@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import Matches from './Matches';
 
 const API_URL = "https://fx.banda.software/ke/highlights/slug/soccer?page=1&per_page=50&highlight_market_id=2&tournament_id=0&category_id=0&daily=0&hours=0&match_live_status=0&today=0&tomorrow=0&upcoming=0&boosted=0&order_type=priority";
 
@@ -70,41 +71,8 @@ export default function PanelDashboard() {
             <div className="stat-card-sub">Pending publish</div>
           </div>
         </div>
-        <div className="section-label">Live Match Data (from API)</div>
-        <div id="dashboardMatchesContainer">
-          {loading ? (
-            <div className="empty-state">
-              <div className="loading-spinner"></div>
-              <div className="empty-state-text">Loading match data…</div>
-            </div>
-          ) : matches.length === 0 ? (
-            <div className="empty-state">
-              <div className="empty-state-text">No match data available</div>
-            </div>
-          ) : (
-            <div className="matches-grid">
-              {matches.slice(0, 12).map((m, i) => (
-                <div className="match-row" key={m.match_id || m.id || i}>
-                  <div style={{display:'flex',alignItems:'center',justifyContent:'space-between'}}>
-                    <div className="match-league">{m.tournament || 'Football'}</div>
-                    {m.boosted_priority === 1 ? <span className="tag amber">⚡ Boosted</span> : <span className="tag">Regular</span>}
-                  </div>
-                  <div className="match-teams">
-                    <div className="match-team-name">{m.home_team || 'Home'}</div>
-                    <div className="match-vs">VS</div>
-                    <div className="match-team-name away">{m.away_team || 'Away'}</div>
-                  </div>
-                  <div className="match-odds">
-                    <div className="odd-pill"><div className="odd-pill-label">1</div><div className="odd-pill-val">{m.highlight_market?.outcomes?.find(o=>o.alias==='1')?.odds ?? '–'}</div></div>
-                    <div className="odd-pill"><div className="odd-pill-label">X</div><div className="odd-pill-val">{m.highlight_market?.outcomes?.find(o=>o.alias==='x')?.odds ?? '–'}</div></div>
-                    <div className="odd-pill"><div className="odd-pill-label">2</div><div className="odd-pill-val">{m.highlight_market?.outcomes?.find(o=>o.alias==='2')?.odds ?? '–'}</div></div>
-                  </div>
-                  <div className="match-date">{m.date} · {m.country || ''}</div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+        <div className="section-label">Featured Matches</div>
+        <Matches />
         <div className="divider"></div>
         <div className="section-label">Recent Creatives</div>
         <div id="dashboardCreativesContainer" className="creatives-grid">

@@ -1,0 +1,84 @@
+.matches-section {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem 1.5rem;
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+}
+.match-search {
+  width: 100%;
+  padding: 0.7rem 1rem;
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #e5e4e7;
+  font-size: 1rem;
+  background: #fafbfc;
+  transition: border 0.2s;
+}
+.match-search:focus {
+  border: 1.5px solid #aa3bff;
+  outline: none;
+}
+.matches-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+.match-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  border: 1px solid #f0f0f0;
+}
+.league {
+  font-size: 0.98rem;
+  color: #b0aeb8;
+  margin-bottom: 0.2rem;
+  font-weight: 500;
+}
+.teams {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: #222;
+}
+.team {
+  flex: 1;
+  text-align: center;
+}
+.vs {
+  color: #fa9602;
+  font-weight: bold;
+  margin: 0 0.7rem;
+}
+.odds {
+  display: flex;
+  gap: 1.2rem;
+  margin-top: 0.3rem;
+  justify-content: center;
+}
+.odd {
+  background: #f4f3ec;
+  padding: 0.35rem 1.1rem;
+  border-radius: 7px;
+  font-weight: 500;
+  font-size: 1.05rem;
+  color: #222;
+  border: 1px solid #ececec;
+}
+@media (max-width: 800px) {
+  .matches-section {
+    max-width: 98vw;
+    padding: 1rem 0.2rem;
+  }
+  .match-card {
+    padding: 1rem 0.7rem;
+  }
+}
