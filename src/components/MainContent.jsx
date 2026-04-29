@@ -1,0 +1,20 @@
+// MainContent placeholder for Bandabets Platform
+import PanelDashboard from './PanelDashboard';
+import PanelBuilder from './PanelBuilder';
+import PanelCreatives from './PanelCreatives';
+import PanelAssets from './PanelAssets';
+import PanelSchedule from './PanelSchedule';
+import PanelAnalytics from './PanelAnalytics';
+
+export default function MainContent({ activePanel }) {
+  return (
+    <div className="main-content">
+      {activePanel === 'dashboard' && <PanelDashboard />}
+      {activePanel === 'builder' && <PanelBuilder />}
+      {activePanel === 'creatives' && <PanelCreatives />}
+      {activePanel === 'assets' && <PanelAssets />}
+      {activePanel === 'schedule' && <PanelSchedule />}
+      {activePanel === 'analytics' && <PanelAnalytics />}
+    </div>
+  );
+}
