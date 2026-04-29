@@ -12,6 +12,28 @@
   <body>
     <div id="root"></div>
     <!-- Use main.jsx for compatibility -->
+    <!-- Global error/debug overlay for WSOD diagnosis -->
+    <div id="global-error-overlay" style="display:none;position:fixed;z-index:99999;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.85);color:#fff;font-family:monospace;font-size:18px;padding:40px 20px;box-sizing:border-box;overflow:auto;"></div>
+    <script>
+      window.addEventListener('error', function(event) {
+        var overlay = document.getElementById('global-error-overlay');
+        overlay.style.display = 'block';
+        overlay.innerHTML = '<b>FATAL ERROR</b><br><br>' +
+          '<pre style="white-space:pre-wrap;word-break:break-all;">' + (event.error ? (event.error.stack || event.error) : event.message) + '</pre>' +
+          '<br><b>URL:</b> ' + window.location.href +
+          '<br><b>User Agent:</b> ' + navigator.userAgent +
+          '<br><br><b>Tip:</b> Screenshot this and send to your developer.';
+      });
+      window.addEventListener('unhandledrejection', function(event) {
+        var overlay = document.getElementById('global-error-overlay');
+        overlay.style.display = 'block';
+        overlay.innerHTML = '<b>UNHANDLED PROMISE REJECTION</b><br><br>' +
+          '<pre style="white-space:pre-wrap;word-break:break-all;">' + (event.reason && event.reason.stack ? event.reason.stack : event.reason) + '</pre>' +
+          '<br><b>URL:</b> ' + window.location.href +
+          '<br><b>User Agent:</b> ' + navigator.userAgent +
+          '<br><br><b>Tip:</b> Screenshot this and send to your developer.';
+      });
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

@@ -1,0 +1,38 @@
+name: Deploy with Debug Overlay
+
+on:
+  push:
+    branches:
+      - platform
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload production-ready build
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-build
+          path: dist
+
+      # Add your deployment step here (e.g., rsync, FTP, S3, etc.)
+      # Example:
+      # - name: Deploy to server
+      #   run: rsync -avz dist/ user@server:/path/to/deploy
+
+      - name: Notify on success
+        run: echo "Deployment with debug overlay complete."
