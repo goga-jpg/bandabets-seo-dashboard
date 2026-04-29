@@ -1,10 +1,11 @@
 
 import './Matches.css';
+
 import { useState } from 'react';
 import { clubLogos } from '../data/clubLogos';
 
-// Example matches (replace with props or API if needed)
-const matches = [
+// Accept matches as a prop for live data, fallback to static if not provided
+const staticMatches = [
   { league: "Netherlands Eredivisie Promotion/Relegation", home: "Den Bosch", away: "Almere City", odds: ["2.7", "3.8", "2.33"] },
   { league: "Portugal Primeira Liga", home: "Sporting CP", away: "Tondela", odds: ["1.14", "8.5", "17"] },
   { league: "England Premier League", home: "Brentford", away: "West Ham", odds: ["2.05", "4.1", "3.6"] },
@@ -16,11 +17,28 @@ const matches = [
   { league: "England Premier League", home: "Chelsea", away: "Nottingham Forest", odds: ["1.75", "4.2", "5"] },
 ];
 
-export default function Matches() {
+
+export default function Matches({ matches }) {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState(null);
 
-  const filtered = matches.filter(
+  // Use live matches if provided, else fallback to static
+  const matchList = Array.isArray(matches) && matches.length > 0 ? matches : staticMatches;
+
+  // Normalize API data if needed
+  const normalized = matchList.map(m => {
+    // Try to support both static and API formats
+    const home = m.home || m.home_team || m.homeTeam || '';
+    const away = m.away || m.away_team || m.awayTeam || '';
+    const league = m.league || m.league_name || m.tournament_name || m.tournament || '';
+    let odds = m.odds || m.odds_array || [];
+    if (!Array.isArray(odds) && odds && typeof odds === 'object') {
+      odds = [odds.home, odds.draw, odds.away].filter(Boolean);
+    }
+    return { ...m, home, away, league, odds };
+  });
+
+  const filtered = normalized.filter(
     m =>
       m.home.toLowerCase().includes(search.toLowerCase()) ||
       m.away.toLowerCase().includes(search.toLowerCase()) ||
@@ -78,7 +96,7 @@ export default function Matches() {
                 </span>
               </div>
               <div className="odds" style={{marginTop:10}}>
-                {m.odds.map((odd, j) => (
+                {m.odds && m.odds.map && m.odds.map((odd, j) => (
                   <span className="odd" key={j}>{odd}</span>
                 ))}
               </div>

@@ -72,7 +72,7 @@ export default function PanelDashboard() {
           </div>
         </div>
         <div className="section-label">Featured Matches</div>
-        <Matches />
+        <Matches matches={matches} />
         <div className="divider"></div>
         <div className="section-label">Recent Creatives</div>
         <div id="dashboardCreativesContainer" className="creatives-grid">
