@@ -1,5 +1,4 @@
 import { useRef, useState, useEffect } from 'react';
-import { useRef, useState, useEffect } from 'react';
 import './BulkGenerate.css';
 
 const POPPINS_FONT_URL = 'https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap';
