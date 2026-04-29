@@ -1,3 +1,4 @@
+import React from 'react';
 export default function PanelCreatives() {
   return (
     <div className="panel" id="panel-creatives">

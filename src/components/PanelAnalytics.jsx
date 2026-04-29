@@ -1,3 +1,4 @@
+import React from 'react';
 export default function PanelAnalytics() {
   return (
     <div className="panel" id="panel-analytics">

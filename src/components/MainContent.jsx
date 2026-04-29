@@ -1,3 +1,4 @@
+import React from 'react';
 // MainContent placeholder for Bandabets Platform
 import PanelDashboard from './PanelDashboard';
 import PanelBuilder from './PanelBuilder';

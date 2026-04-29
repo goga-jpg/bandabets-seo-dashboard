@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { uploadAsset, listAssets, getAssetUrl } from '../api/supabaseAssets';
 
 export default function PanelAssets() {

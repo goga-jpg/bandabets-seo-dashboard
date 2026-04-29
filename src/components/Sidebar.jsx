@@ -1,3 +1,4 @@
+import React from 'react';
 // Sidebar component for Bandabets Platform
 export default function Sidebar({ onPanelSwitch, activePanel }) {
   return (

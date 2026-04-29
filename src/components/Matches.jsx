@@ -1,7 +1,6 @@
 
+import React, { useState } from 'react';
 import './Matches.css';
-
-import { useState } from 'react';
 
 // Simple error boundary for WSOD protection
 function ErrorBoundary({ children }) {

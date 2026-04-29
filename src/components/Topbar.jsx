@@ -1,3 +1,4 @@
+import React from 'react';
 // Topbar component for Bandabets Platform
 export default function Topbar({ onPanelSwitch, activePanel }) {
   return (

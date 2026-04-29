@@ -1,3 +1,4 @@
+import React from 'react';
 export default function PanelSchedule() {
   return (
     <div className="panel" id="panel-schedule">
