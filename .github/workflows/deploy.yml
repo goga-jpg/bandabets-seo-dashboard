@@ -1,3 +1,5 @@
+      - name: Print .env file for debug
+        run: cat .env
 
 name: Build & Deploy
 
