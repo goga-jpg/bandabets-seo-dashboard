@@ -1,3 +1,5 @@
+            - name: List files in root for debug
+              run: ls -al
       - name: Print .env file for debug
         run: cat .env
 
