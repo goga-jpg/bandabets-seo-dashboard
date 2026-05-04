@@ -18,6 +18,7 @@ function App() {
         <Sidebar onPanelSwitch={handlePanelSwitch} activePanel={activePanel} />
         <MainContent activePanel={activePanel} />
       </div>
+      // Trigger redeploy: No code changes, just a comment for workflow
     </div>
   );
 }
