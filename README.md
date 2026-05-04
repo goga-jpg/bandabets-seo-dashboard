@@ -2,9 +2,9 @@
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Workflow Trigger Test
+## Workflow Trigger Test (May 4, 2026)
 
-This line was added to trigger the GitHub Actions workflow on the platform branch.
+This line was added to trigger the GitHub Actions workflow on the platform branch. Latest workflow includes .env creation for Supabase config.
 
 Currently, two official plugins are available:
 
